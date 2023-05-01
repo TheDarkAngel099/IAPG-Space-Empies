@@ -5,6 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - Space
+  - Zerg
+  - Protoss
+  - Terran
+  - Asteroid
+  - Star
+  - Planet
   layers:
   - Default
   - TransparentFX

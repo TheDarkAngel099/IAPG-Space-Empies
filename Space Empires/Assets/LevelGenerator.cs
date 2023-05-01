@@ -7,8 +7,8 @@ public class LevelGenerator : MonoBehaviour
 {
      [Range(0,100)]
     public int astroidDensity;
-    [SerializeField] int hight;
-    [SerializeField] int width;
+    public int hight = 256;
+    public int width = 128;
    
     [SerializeField] string seed;
     public bool enableRandSeed;
@@ -19,12 +19,17 @@ public class LevelGenerator : MonoBehaviour
     public int iterations;
     public int aliveThings = 4;
     
-  int [,] level;
+    
+    
+    int [,] level;
+    
+
+
 
     void Start()
     {
         level = GenerateLevel();
-        //PhysicalLevel(level);
+        PhysicalLevel(level);
 
     }
     void Update()
@@ -77,9 +82,14 @@ public class LevelGenerator : MonoBehaviour
                 {
                     level[x,y] = (randNumberGen.Next(0,100) < astroidDensity) ? 1 : 0;
                 }
+                
             }
         }
     }
+
+   
+    
+    
 
     int GetSurroundingDeadCellCount(int xGrid, int yGrid)
     {
@@ -154,8 +164,12 @@ public class LevelGenerator : MonoBehaviour
         
 
         int [,] level = lvl;
-       bool starPlaced = true;
-       bool planetsPlaced = true; 
+        bool starPlaced = true;
+        bool planetsPlaced = true; 
+        int centerCellX = hight/2;
+        int centerCellY = width / 2;
+        level[centerCellX, centerCellY] = 0;
+       
 
         
         for (int x = 0; x < level.GetUpperBound(0); ++x)
@@ -167,12 +181,12 @@ public class LevelGenerator : MonoBehaviour
                 {
                     Instantiate(astroid, new Vector3(x, 0f, y), Quaternion.Euler(Vector3.zero));
                 }
-                if (level[x, y] == 0 && starPlaced && x == 128 && y == 256)
+                if (level[centerCellX, centerCellY] == 0 && starPlaced )
                 {
-                    Instantiate(star, new Vector3(x, 0f, y), Quaternion.Euler(Vector3.zero));
+                    Instantiate(star, new Vector3(centerCellX, 0f, centerCellY), Quaternion.Euler(Vector3.zero));
                     starPlaced = false;
                 }
-                if (level[x, y] == 0 && planetsPlaced &&  100 < x && x < 150 &&  225 < y && y < 275 && x% 20 == 0 && y% 20 == 1)
+                if (level[x, y] == 0 && planetsPlaced &&  centerCellX - 25 < x && x < centerCellX + 25 &&  centerCellY - 25 < y && y < centerCellY +25 && x% 35 == 0 && y% 35 == 1)
                 {
                     Instantiate(planet, new Vector3(x, 0f, y), Quaternion.Euler(Vector3.zero));
                     //planetsPlaced = false;
