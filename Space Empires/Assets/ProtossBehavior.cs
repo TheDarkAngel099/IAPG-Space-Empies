@@ -56,8 +56,9 @@ public class ProtossBehavior : MonoBehaviour
          {
              ChangeBehavior(attackTarget, distanceThreshold); // Change behavior based on distance
          }*/
-
+        // change behavior based on distance
         ChangeBehavior(attackTarget, 20f);
+        // switch to new behavior tree
         SwitchTree(InitialiseBehaviourTree(behave));
 
 
@@ -66,7 +67,7 @@ public class ProtossBehavior : MonoBehaviour
 
     }
 
-
+    // initialize behavior tree based on behavior variable
     private Root InitialiseBehaviourTree( int behave)
     {
         switch(behave)
@@ -79,6 +80,7 @@ public class ProtossBehavior : MonoBehaviour
 
     }
 
+    // behavior tree for wandering
     private Root WonderBehave()
     {
         return new Root(new Sequence(
@@ -86,6 +88,7 @@ public class ProtossBehavior : MonoBehaviour
             new Wait(2f)
             ));
     }
+    // behavior tree for attacking
     private Root AttackBehave(GameObject attackTarget)
     {
         return new Root(new Sequence(
@@ -96,6 +99,7 @@ public class ProtossBehavior : MonoBehaviour
             new Wait(2f)
             ));
     }
+    // behavior tree for fleeing
     private Root FleeBehave()
     {
         return new Root(new Sequence(
@@ -110,7 +114,7 @@ public class ProtossBehavior : MonoBehaviour
             new Wait(2f)
             ));
     }
-
+    // function for exploring/wandering
     private void Explore () 
     {
         Vector3 accel = wander.GetSteering();
@@ -118,17 +122,19 @@ public class ProtossBehavior : MonoBehaviour
         steeringBasics.LookWhereYoureGoing();
 
     }
+    //function for attacking
     private void Attack( GameObject target)
     {
         Debug.Log("attacking" + target);
     }
+    // behavior for fleeing from target
     private void fleeFrom(GameObject target)
     {
         Vector3 accel = flee.GetSteering(target.transform.position);
         steeringBasics.Steer(accel);
         steeringBasics.LookWhereYoureGoing();
     }
-
+    // behavior for pursuing
     private void PersueTarget(GameObject target)
     {
         Vector3 accel = pursue.GetSteering(target.GetComponent<MovementAIRigidbody>());
@@ -136,7 +142,7 @@ public class ProtossBehavior : MonoBehaviour
         steeringBasics.LookWhereYoureGoing();
     }
 
-
+    // calculate distance to target
     float CheckDistance(GameObject target)
     {
         float distance = Vector3.Distance(this.transform.position, target.transform.position);
@@ -144,6 +150,7 @@ public class ProtossBehavior : MonoBehaviour
     }
 
 
+    // This function changes the behavior of the game object based on the distance to the target
     private void ChangeBehavior(GameObject attacktarget, float distanceThreshold)
     {
         float distance = Vector3.Distance(this.transform.position, attacktarget.transform.position);
