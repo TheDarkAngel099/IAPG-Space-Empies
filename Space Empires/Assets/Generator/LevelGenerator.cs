@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator : MonoBehaviour            
 {
-     [Range(0,100)]
+    [Range(0,100)]
     public int astroidDensity; // Density of asteroids in the generated level, adjustable in the editor
     public int hight = 256; // Height of the generated level
     public int width = 128; // Width of the generated level
@@ -215,6 +215,6 @@ public class LevelGenerator : MonoBehaviour
         }
        }
     }*/
-
+    // this implementation is based on the implementation of celular autometa by Sebastian Lague https://www.youtube.com/watch?v=v7yyZZjF1z4
 
 }

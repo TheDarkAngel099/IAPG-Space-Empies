@@ -138,9 +138,9 @@ public class ZergBehave : MonoBehaviour
         float distance = Vector3.Distance(this.transform.position, target.transform.position); // Calculate the distance between the agent and the target
         return distance;// Return the calculated distance
     }
-   
 
 
 
+    //Refrance : Scripts from UnityMovementAI have been used in this colde including some of the functions
 
 }
