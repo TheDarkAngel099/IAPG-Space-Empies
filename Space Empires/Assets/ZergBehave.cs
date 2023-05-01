@@ -19,7 +19,7 @@ public class ZergBehave : MonoBehaviour
     public GameObject attackTarget;
     public GameObject protoss;
  
-    int behave = 1; // State variable for behavior
+    int behave = 0; // State variable for behavior
 
     private void Awake()
     {
@@ -41,43 +41,51 @@ public class ZergBehave : MonoBehaviour
     }
     private void Update()
     {
-        // Check if behavior needs to be updated
-        //UpdateBehave();
+      
     }
 
 
-    // UpdateBehave method updates state variable based on distance to protoss
-    private void UpdateBehave()
-    {
-        
-        float distance = Vector3.Distance(transform.position, protoss.transform.position);
-        // If within range of protoss, switch to attacking protoss behavior
-        if (distance < 25)
-        {
-            behave = 2;
-        }
-        else
-            // Otherwise, continue attacking Terran behavior
-            behave = 1;
-
-}
-
-
-    // CreateBehaviorTree method creates the behavior tree based on state variable
+   
     private Root CreateBehaviourTree(float behave)
     {
         switch(behave)
         {
-
+            case 0:
+                return ZergBerg(attackTarget);
             case 1:
-                return AttackTarren(attackTarget);
-            case 2:
                 return AttackProtoss();
             default:
-                return WonderBehave();
+                return AttackTarren(attackTarget);
         }
 
     }
+
+
+
+    private Root ZergBerg(GameObject attackTarget)
+    {
+        return new Root(new Selector(
+            // If close enough to Tarren, attack Tarren
+            new Sequence(
+                new Condition(() => CheckDistance(attackTarget) < 700f, new Action(() => SeekTarget(attackTarget))),
+                new Condition(() => CheckDistance(attackTarget) < 5f, new Action(() => Attack(attackTarget))),
+                new Wait(2f)
+            ),
+            // If close enough to Protoss, attack Protoss
+            new Sequence(
+                new Condition(() => CheckDistance(protoss) < 10f,
+                new Action(() => SeekTarget(protoss))),
+                new Condition(() => CheckDistance(protoss) < 5f, new Action(() => Attack(protoss))),
+                new Wait(10f)
+            )
+        
+
+        ));
+    }
+
+  
+
+
     // AttackTerran method returns a behavior tree to attack the Terran target
     private Root AttackTarren(GameObject attackTarget)
     {
@@ -130,21 +138,7 @@ public class ZergBehave : MonoBehaviour
         float distance = Vector3.Distance(this.transform.position, target.transform.position); // Calculate the distance between the agent and the target
         return distance;// Return the calculated distance
     }
-    //returns a wonder behaviour 
-    private Root WonderBehave()
-    {
-        return new Root(new Sequence(
-            new Action(() => Explore()),
-            new Wait(2f)
-            ));
-    }
-    private void Explore()
-    {
-        Vector3 accel = wander.GetSteering(); // Calculate the desired steering acceleration using the Wander behavior
-        steeringBasics.Steer(accel); // Apply the steering force to move the agent
-        steeringBasics.LookWhereYoureGoing(); // Rotate the agent to face the direction of motion
-
-    }
+   
 
 
 

@@ -42,26 +42,12 @@ public class ProtossBehavior : MonoBehaviour
         attackTarget = GameObject.FindGameObjectWithTag("Terran");
         pursue = GetComponent<Pursue>();
         tree = InitialiseBehaviourTree(0);
+        tree.Start();
         
     }
     private void Update()
     {
-        //ListUpdate();
-        /* if (attackTarget ==  null)
-         {
-             Debug.Log(" no one to chase");
-
-         }
-         else
-         {
-             ChangeBehavior(attackTarget, distanceThreshold); // Change behavior based on distance
-         }*/
-        // change behavior based on distance
-        ChangeBehavior(attackTarget, 20f);
-        // switch to new behavior tree
-        SwitchTree(InitialiseBehaviourTree(behave));
-
-
+       
         
        
 
@@ -72,7 +58,8 @@ public class ProtossBehavior : MonoBehaviour
     {
         switch(behave)
         {
-            
+
+            case 0: return ProtossBehave(attackTarget, fleeTarget);
             case 1: return AttackBehave(attackTarget);
             case 2: return FleeBehave();
             default: return WonderBehave();
@@ -80,40 +67,63 @@ public class ProtossBehavior : MonoBehaviour
 
     }
 
+    private Root ProtossBehave(GameObject attackTarget, GameObject fleeTarget)
+    {
+        return new Root(new Selector(
+            // Attack behavior
+            new Sequence(
+                new Condition(() => CheckDistance(attackTarget) < 20f, new Action(() => SeekTarget(attackTarget))),
+                new Condition(() => CheckDistance(attackTarget) < 5f, new Action(() => Attack(attackTarget))),
+                new Wait(2f)
+            ),
+            // Flee behavior
+            new Sequence(
+                new Action(() => fleeFrom(fleeTarget)),
+                new Wait(2f)
+            ),
+            // Wander behavior
+            new Sequence(
+                new Action(() => Explore()),
+                new Wait(2f)
+            )
+        ));
+    }
+   
+  
     // behavior tree for wandering
     private Root WonderBehave()
     {
         return new Root(new Sequence(
-            new Action(() => Explore()),
-            new Wait(2f)
-            ));
+        new Action(() => Explore()),
+        new Wait(2f)
+        ));
     }
-    // behavior tree for attacking
-    private Root AttackBehave(GameObject attackTarget)
-    {
-        return new Root(new Sequence(
-
-            new Action(() => PersueTarget(attackTarget)),
-            new Condition(() => CheckDistance(attackTarget) < 50f, 
-            new Action(() => Attack(attackTarget))),
-            new Wait(2f)
-            ));
-    }
-    // behavior tree for fleeing
-    private Root FleeBehave()
-    {
-        return new Root(new Sequence(
-            new Action(() => fleeFrom(fleeTarget)),
-            new Wait(2f)
-            ));
-    }
-    private Root PersueBehave()
-    {
-        return new Root(new Sequence(
-            new Action(() => PersueTarget(attackTarget)),
-            new Wait(2f)
-            ));
-    }
+    
+  // behavior tree for attacking
+  private Root AttackBehave(GameObject attackTarget)
+  {
+      return new Root(new Sequence(
+      new Action(() => PersueTarget(attackTarget)),
+      new Condition(() => CheckDistance(attackTarget) < 50f,
+      new Action(() => Attack(attackTarget))),
+      new Wait(2f)
+      ));
+  }
+  // behavior tree for fleeing
+  private Root FleeBehave()
+  {
+      return new Root(new Sequence(
+      new Action(() => fleeFrom(fleeTarget)),
+      new Wait(2f)
+      ));
+  }
+  private Root PersueBehave()
+  {
+      return new Root(new Sequence(
+      new Action(() => PersueTarget(attackTarget)),
+          new Wait(2f)
+          ));
+  }
     // function for exploring/wandering
     private void Explore () 
     {
@@ -148,62 +158,19 @@ public class ProtossBehavior : MonoBehaviour
         float distance = Vector3.Distance(this.transform.position, target.transform.position);
         return distance;
     }
-
-
-    // This function changes the behavior of the game object based on the distance to the target
-    private void ChangeBehavior(GameObject attacktarget, float distanceThreshold)
+    private void SeekTarget(GameObject target)
     {
-        float distance = Vector3.Distance(this.transform.position, attacktarget.transform.position);
-
-        if (distance < distanceThreshold)
-        {
-            
-            tree = InitialiseBehaviourTree(1); // Change to AttackBehave()
-            behave = 1;
-            Debug.Log("attackBehave");
-        }
-        else
-        {
-            tree = InitialiseBehaviourTree(0); // Change to WonderBehave()
-            behave = 0;
-        }
+        Vector3 accel = steeringBasics.Seek(target.transform.position);// Calculate the desired steering acceleration using the Seek behavior
+        steeringBasics.Steer(accel); // Apply the steering force to move the agent
+        steeringBasics.LookWhereYoureGoing();  // Rotate the agent to face the direction of motion
     }
+
+
+
+
+
 
    
-
-    void ListUpdate() 
-    {
-        foreach (GameObject zerg in GameObject.FindGameObjectsWithTag("Zerg"))
-        {
-            zergList.Add(zerg);
-        }
-        foreach (GameObject tarren in GameObject.FindGameObjectsWithTag("Tarren"))
-        {
-            tarrenList.Add(tarren);
-        }
-        foreach (GameObject protoss in GameObject.FindGameObjectsWithTag("Protoss"))
-        {
-            protossList.Add(protoss);
-        }
-        foreach (GameObject star in GameObject.FindGameObjectsWithTag("Star"))
-        {
-            starList.Add(star);
-        }
-        foreach (GameObject planet in GameObject.FindGameObjectsWithTag("Planet"))
-        {
-            planetList.Add(planet);
-        }
-    }
-    private void SwitchTree(Root newTree)
-    {
-        if (tree != null)
-        {
-            tree.Stop();
-        }
-        tree = newTree;
-        tree.Start();
-
-    }
 
 
 
